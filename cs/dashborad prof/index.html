@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>School Attendance System</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+   <style>
+    :root {
+      --primary: #cb0c9f;
+      --dark: #344767;
+      --success: #82d616;
+      --info: #17c1e8;
+      --warning: #fbcf33;
+      --danger: #ea0606;
+    }
+    
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #f8f9fa;
+    }
+    
+    .sidenav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 250px;
+      background: white;
+      box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    
+    .sidenav-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .nav-link {
+      color: var(--dark);
+      padding: 0.675rem 1rem;
+      margin: 0.25rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.15s ease;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      background: linear-gradient(195deg, var(--primary), #ad0a83);
+      color: white;
+    }
+    
+    .nav-link i {
+      margin-right: 0.5rem;
+    }
+    
+    .main-content {
+      margin-left: 250px;
+      padding: 2rem;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: linear-gradient(195deg, var(--primary), #ad0a83);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+    }
+    
+    .qr-code-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 1rem;
+      margin: 1rem 0;
+      min-height: 300px;
+    }
+
+    #qrcode {
+      display: inline-block;
+    }
+    
+    .student-item {
+      padding: 1rem;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .student-item:last-child {
+      border-bottom: none;
+    }
+    
+    .badge-status {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    .badge-present {
+      background: #d4f4dd;
+      color: #1aa053;
+    }
+    
+    .badge-absent {
+      background: #fdd8d8;
+      color: #c41e3a;
+    }
+    
+    .btn-action {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    
+    .btn-mark-present {
+      background: var(--success);
+      color: white;
+    }
+    
+    .btn-mark-absent {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .code-timer {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--dark);
+      margin-top: 1rem;
+    }
+    
+    .generate-code-btn {
+      background: linear-gradient(195deg, var(--primary), #ad0a83);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .generate-code-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(203,12,159,0.3);
+    }
+
+    .search-box {
+      padding: 0.75rem;
+      border: 1px solid #d2d6da;
+      border-radius: 0.5rem;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+   </style>
+</head>
+<body>
+  <aside class="sidenav">
+    <div class="sidenav-header">
+      <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Attendance System</h5>
+    </div>
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+          <i class="fas fa-chart-line"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" onclick="showSection('daily-code')">
+          <i class="fas fa-qrcode"></i>
+          <span>QR Code</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" onclick="showSection('students')">
+          <i class="fas fa-users"></i>
+          <span>Students</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" onclick="showSection('history')">
+          <i class="fas fa-history"></i>
+          <span>Attendance History</span>
+        </a>
+      </li>
+      <li class="nav-item mt-3">
+        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account</h6>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" onclick="showSection('settings')">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <div id="dashboard-section" class="content-section">
+      <h2 class="mb-4">Dashboard Overview</h2>
+      
+      <div class="row">
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-0 opacity-75">Total Students</p>
+                <h3 class="mb-0" id="total-students">0</h3>
+              </div>
+              <i class="fas fa-users fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card" style="background: linear-gradient(195deg, var(--success), #5fa913);">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-0 opacity-75">Present Today</p>
+                <h3 class="mb-0" id="present-today">0</h3>
+              </div>
+              <i class="fas fa-check-circle fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card" style="background: linear-gradient(195deg, var(--danger), #b10505);">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-0 opacity-75">Absent Today</p>
+                <h3 class="mb-0" id="absent-today">0</h3>
+              </div>
+              <i class="fas fa-times-circle fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card" style="background: linear-gradient(195deg, var(--info), #1171ef);">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-0 opacity-75">Attendance Rate</p>
+                <h3 class="mb-0" id="attendance-rate">0%</h3>
+              </div>
+              <i class="fas fa-percentage fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-body">
+              <h5>Today's Attendance</h5>
+              <div id="today-attendance-list"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5>Quick Actions</h5>
+              <button class="btn generate-code-btn w-100 mb-2" onclick="generateQRCode()">
+                <i class="fas fa-qrcode"></i> Generate New QR
+              </button>
+              <button class="btn btn-outline-primary w-100 mb-2" onclick="showSection('students')">
+                <i class="fas fa-users"></i> Manage Students
+              </button>
+              <button class="btn btn-outline-success w-100" onclick="exportAttendance()">
+                <i class="fas fa-download"></i> Export Data
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="daily-code-section" class="content-section" style="display:none;">
+      <h2 class="mb-4">Daily Attendance QR Code</h2>
+      
+      <div class="card">
+        <div class="card-body text-center">
+          <h5>Scan QR Code to Mark Attendance</h5>
+          <div class="qr-code-container" id="qr-container">
+            <div id="qrcode"></div>
+          </div>
+          <div class="code-timer" id="code-timer">
+            Code expires at midnight
+          </div>
+          <button class="generate-code-btn mt-3" onclick="generateQRCode()">
+            <i class="fas fa-sync-alt"></i> Generate New QR Code
+          </button>
+          <p class="mt-3 text-muted">Students scan this QR code to mark their attendance</p>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5>Code History (Last 7 Days)</h5>
+          <div id="code-history"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="students-section" class="content-section" style="display:none;">
+      <h2 class="mb-4">Student Management</h2>
+      
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <input type="text" class="search-box" placeholder="Search students..." id="student-search" onkeyup="filterStudents()">
+            <button class="btn generate-code-btn" onclick="addStudent()">
+              <i class="fas fa-plus"></i> Add Student
+            </button>
+          </div>
+          
+          <div id="students-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="history-section" class="content-section" style="display:none;">
+      <h2 class="mb-4">Attendance History</h2>
+      
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-3">
+            <label>Select Date Range:</label>
+            <div class="d-flex gap-2">
+              <input type="date" class="form-control" id="history-start-date">
+              <input type="date" class="form-control" id="history-end-date">
+              <button class="btn btn-primary" onclick="loadHistory()">Load</button>
+            </div>
+          </div>
+          <div id="history-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="settings-section" class="content-section" style="display:none;">
+      <h2 class="mb-4">Settings</h2>
+      
+      <div class="card">
+        <div class="card-body">
+          <h5>System Settings</h5>
+          <div class="form-group mb-3">
+            <label>School Name</label>
+            <input type="text" class="form-control" id="school-name" value="My School">
+          </div>
+          <div class="form-group mb-3">
+            <label>Academic Year</label>
+            <input type="text" class="form-control" id="academic-year" value="2024-2025">
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="auto-generate-code" checked>
+            <label class="form-check-label" for="auto-generate-code">
+              Auto-generate daily QR code at midnight
+            </label>
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    let students = [
+      { id: 1, name: "Ahmed Hassan", code: "STD001", status: "present" },
+      { id: 2, name: "Fatima Ali", code: "STD002", status: "present" },
+      { id: 3, name: "Mohamed Ibrahim", code: "STD003", status: "absent" },
+      { id: 4, name: "Sara Ahmed", code: "STD004", status: "present" },
+      { id: 5, name: "Youssef Mahmoud", code: "STD005", status: "absent" }
+    ];
+
+    let dailyCode = "";
+    let codeHistory = [];
+    let qrCodeObj = null;
+
+    function init() {
+      checkAndGenerateQRCode();
+      updateDashboard();
+      renderStudentsList();
+      setInterval(updateCodeTimer, 1000);
+    }
+
+    function generateQRCode() {
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const today = new Date().toISOString().split('T')[0];
+      
+      dailyCode = code;
+      codeHistory.unshift({ date: today, code: code });
+      if (codeHistory.length > 7) codeHistory.pop();
+      
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      
+      new QRCode(qrContainer, {
+        text: `ATTENDANCE:${code}:${today}`,
+        width: 256,
+        height: 256,
+        colorDark: "#344767",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      
+      updateCodeHistory();
+      students.forEach(s => s.status = "absent");
+      updateDashboard();
+      
+      alert('New QR code generated!');
+    }
+
+    function checkAndGenerateQRCode() {
+      const today = new Date().toISOString().split('T')[0];
+      const lastCode = codeHistory[0];
+      
+      if (!lastCode || lastCode.date !== today) {
+        generateQRCode();
+      } else {
+        dailyCode = lastCode.code;
+        const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, {
+          text: `ATTENDANCE:${dailyCode}:${today}`,
+          width: 256,
+          height: 256,
+          colorDark: "#344767",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        updateCodeHistory();
+      }
+    }
+
+    function updateCodeTimer() {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight - now;
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      const timer = document.getElementById('code-timer');
+      if (timer) {
+        timer.textContent = `Code expires in ${hours}h ${minutes}m ${seconds}s`;
+      }
+    }
+
+    function updateCodeHistory() {
+      const html = codeHistory.map(item => `
+        <div class="student-item">
+          <div>
+            <strong>${item.date}</strong>
+          </div>
+          <div>
+            <span class="badge-status badge-present">${item.code}</span>
+          </div>
+        </div>
+      `).join('');
+      
+      const element = document.getElementById('code-history');
+      if (element) element.innerHTML = html || '<p class="text-muted">No history available</p>';
+    }
+
+    function renderStudentsList() {
+      const html = students.map(student => `
+        <div class="student-item">
+          <div>
+            <strong>${student.name}</strong><br>
+            <small class="text-muted">Code: ${student.code}</small>
+          </div>
+          <div>
+            <span class="badge-status ${student.status === 'present' ? 'badge-present' : 'badge-absent'}">
+              ${student.status === 'present' ? 'Present' : 'Absent'}
+            </span>
+            <button class="btn-action btn-mark-present ms-2" onclick="markAttendance(${student.id}, 'present')">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="btn-action btn-mark-absent ms-2" onclick="markAttendance(${student.id}, 'absent')">
+              <i class="fas fa-times"></i>
+            </button>
+            <button class="btn btn-sm btn-danger ms-2" onclick="deleteStudent(${student.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('students-list').innerHTML = html;
+      updateDashboard();
+    }
+
+    function markAttendance(studentId, status) {
+      const student = students.find(s => s.id === studentId);
+      if (student) {
+        student.status = status;
+        renderStudentsList();
+      }
+    }
+
+    function addStudent() {
+      const name = prompt("Enter student name:");
+      if (!name) return;
+      
+      const code = "STD" + String(students.length + 1).padStart(3, '0');
+      students.push({
+        id: students.length + 1,
+        name: name,
+        code: code,
+        status: "absent"
+      });
+      
+      renderStudentsList();
+    }
+
+    function deleteStudent(studentId) {
+      if (confirm("Are you sure you want to delete this student?")) {
+        students = students.filter(s => s.id !== studentId);
+        renderStudentsList();
+      }
+    }
+
+    function filterStudents() {
+      const search = document.getElementById('student-search').value.toLowerCase();
+      const filtered = students.filter(s => 
+        s.name.toLowerCase().includes(search) || 
+        s.code.toLowerCase().includes(search)
+      );
+      
+      const html = filtered.map(student => `
+        <div class="student-item">
+          <div>
+            <strong>${student.name}</strong><br>
+            <small class="text-muted">Code: ${student.code}</small>
+          </div>
+          <div>
+            <span class="badge-status ${student.status === 'present' ? 'badge-present' : 'badge-absent'}">
+              ${student.status === 'present' ? 'Present' : 'Absent'}
+            </span>
+            <button class="btn-action btn-mark-present ms-2" onclick="markAttendance(${student.id}, 'present')">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="btn-action btn-mark-absent ms-2" onclick="markAttendance(${student.id}, 'absent')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('students-list').innerHTML = html;
+    }
+
+    function updateDashboard() {
+      const total = students.length;
+      const present = students.filter(s => s.status === 'present').length;
+      const absent = total - present;
+      const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+      
+      document.getElementById('total-students').textContent = total;
+      document.getElementById('present-today').textContent = present;
+      document.getElementById('absent-today').textContent = absent;
+      document.getElementById('attendance-rate').textContent = rate + '%';
+      
+      const html = students.map(student => `
+        <div class="student-item">
+          <div>
+            <strong>${student.name}</strong><br>
+            <small class="text-muted">${student.code}</small>
+          </div>
+          <span class="badge-status ${student.status === 'present' ? 'badge-present' : 'badge-absent'}">
+            ${student.status === 'present' ? 'Present' : 'Absent'}
+          </span>
+        </div>
+      `).join('');
+      
+      const element = document.getElementById('today-attendance-list');
+      if (element) element.innerHTML = html;
+    }
+
+    function showSection(section) {
+      document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(section + '-section').style.display = 'block';
+      event.target.closest('.nav-link').classList.add('active');
+    }
+
+    function exportAttendance() {
+      const csv = "Name,Code,Status\n" + students.map(s => 
+        `${s.name},${s.code},${s.status}`
+      ).join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'attendance_' + new Date().toISOString().split('T')[0] + '.csv';
+      a.click();
+    }
+
+    function saveSettings() {
+      alert('Settings saved successfully!');
+    }
+
+    function loadHistory() {
+      alert('Loading attendance history...');
+    }
+
+    init();
+</script>
+</body>
+</html>
