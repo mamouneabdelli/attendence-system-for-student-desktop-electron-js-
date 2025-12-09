@@ -7,7 +7,7 @@ function createWindow() {
   
   });
 
-  win.loadFile('admindash.html');
+  win.loadFile('index.html');
 }
 
 app.whenReady().then(createWindow);
@@ -22,4 +22,5 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+
 });
