@@ -1,23 +1,23 @@
 
-        // Data storage
+       
         let teachers = [
-            { id: 1, name: 'John Smith', email: 'john@example.com', level: 'Expert', specialization: 'Mathematics' },
-            { id: 2, name: 'Sarah Johnson', email: 'sarah@example.com', level: 'Advanced', specialization: 'Computer Science' },
-            { id: 3, name: 'Michael Brown', email: 'michael@example.com', level: 'Intermediate', specialization: 'Physics' },
-            { id: 4, name: 'Emily Davis', email: 'emily@example.com', level: 'Beginner', specialization: 'English Literature' }
+            { id: 1, name: 'hanousse', email: 'john@example.com', level: 'Expert', specialization: 'security' },
+            { id: 2, name: 'kouihla najib', email: 'sarah@example.com', level: 'Advanced', specialization: 'graph' },
+            { id: 3, name: 'kouihla zinedine', email: 'michael@example.com', level: 'Intermediate', specialization: 'algo' },
+           
         ];
 
         let students = [
-            { id: 1, name: 'Alice Johnson', studentId: 'STU2025001', email: 'alice@example.com', level: 'Sophomore', major: 'Computer Science' },
-            { id: 2, name: 'Bob Williams', studentId: 'STU2025002', email: 'bob@example.com', level: 'Junior', major: 'Mathematics' },
-            { id: 3, name: 'Carol Miller', studentId: 'STU2025003', email: 'carol@example.com', level: 'Freshman', major: 'Physics' },
-            { id: 4, name: 'David Wilson', studentId: 'STU2025004', email: 'david@example.com', level: 'Senior', major: 'Engineering' }
+            { id: 1, name: 'boulahia yahia', studentId: 'STU2025001', email: 'yahia@example.com', level: 'Sophomore', major: 'Computer Science' },
+            { id: 2, name: 'abdelli abdelmoumen', studentId: 'STU2025002', email: 'abdelli@example.com', level: 'Junior', major: 'Mathematics' },
+            { id: 3, name: 'brahmia lokman', studentId: 'STU2025003', email: 'brahmial@example.com', level: 'Freshman', major: 'Physics' },
+            { id: 4, name: 'sid ali', studentId: 'STU2025004', email: 'sidali@example.com', level: 'Senior', major: 'Engineering' }
         ];
 
         let modules = [
-            { id: 1, name: 'Data Structures', code: 'CS201', level: '200', credits: 3, teacher: 'Sarah Johnson' },
-            { id: 2, name: 'Calculus I', code: 'MATH101', level: '100', credits: 4, teacher: 'John Smith' },
-            { id: 3, name: 'Physics Fundamentals', code: 'PHY101', level: '100', credits: 3, teacher: 'Michael Brown' }
+            { id: 1, name: 'Data Structures', code: 'CS201', level: '200', credits: 3, teacher: 'hanousse' },
+            { id: 2, name: 'Calculus I', code: 'MATH101', level: '100', credits: 4, teacher: 'najib' },
+            { id: 3, name: 'Physics Fundamentals', code: 'PHY101', level: '100', credits: 3, teacher: 'uwo' }
         ];
 
         let courses = [
@@ -27,11 +27,11 @@
         ];
 
         let sessions = [
-            { id: 1, name: 'Fall 2025', start: '2025-09-01', end: '2025-12-15', teacher: 'John Smith', module: 'Calculus I' },
-            { id: 2, name: 'Spring 2026', start: '2026-01-15', end: '2026-05-30', teacher: 'Sarah Johnson', module: 'Data Structures' }
+            { id: 1, name: 'Fall 2025', start: '2025-09-01', end: '2025-12-15', teacher: 'hanousse', module: 'Calculus I' },
+            { id: 2, name: 'Spring 2026', start: '2026-01-15', end: '2026-05-30', teacher: 'najib', module: 'Data Structures' }
         ];
 
-        // Initialize dashboard
+        
         window.onload = function() {
             updateStats();
             displayTeachers();
@@ -43,20 +43,20 @@
             updateModuleSelect();
         };
 
-        // Navigation
+        
         function showSection(section) {
-            // Update active menu
+           
             document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Show selected section
+            
             const sections = ['dashboard', 'teachers', 'students', 'modules', 'courses', 'sessions'];
             sections.forEach(sec => {
                 document.getElementById(sec + 'Section').classList.add('hidden');
             });
             document.getElementById(section + 'Section').classList.remove('hidden');
             
-            // Update stats when dashboard is shown
+            
             if (section === 'dashboard') {
                 updateStats();
             }
@@ -65,12 +65,12 @@
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 alert('Logged out successfully!');
-                // In a real app, you would redirect to login page
+               
                 window.location.reload();
             }
         }
 
-        // Update dashboard statistics
+       
         function updateStats() {
             document.getElementById('teacherCount').textContent = teachers.length;
             document.getElementById('studentCount').textContent = students.length;
@@ -413,4 +413,5 @@
         function editSession(index) {
             alert(`Edit session: ${sessions[index].name}\n\nIn a real application, this would open an edit form.`);
         }
+
    
