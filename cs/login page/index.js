@@ -1,9 +1,9 @@
 
-        // User storage (in real app, this would be a database)
+       
         let users = {
             'teacher@school.com': { 
-                name: 'John Teacher', 
-                password: 'teacher123', 
+                name: 'hanousse Teacher', 
+                password: 't123', 
                 role: 'teacher' 
             },
             'admin@school.com': { 
@@ -153,4 +153,5 @@
                 closeContactModal();
             }
         });
+
     
