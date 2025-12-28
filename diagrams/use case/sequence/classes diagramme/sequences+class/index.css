@@ -1,0 +1,234 @@
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            padding: 0 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .diagram-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .diagram-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .diagram-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .diagram-description {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .actor {
+            fill: #667eea;
+        }
+
+        .lifeline {
+            stroke: #667eea;
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+        }
+
+        .activation {
+            fill: #764ba2;
+            stroke: #764ba2;
+            stroke-width: 2;
+        }
+
+        .message {
+            stroke: #333;
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+        }
+
+        .return-message {
+            stroke: #666;
+            stroke-width: 1.5;
+            stroke-dasharray: 5, 5;
+            marker-end: url(#arrowhead-return);
+        }
+
+        .class-box {
+            fill: #fff;
+            stroke: #667eea;
+            stroke-width: 2;
+        }
+
+        .class-name {
+            fill: #667eea;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .attribute, .method {
+            fill: #333;
+            font-size: 13px;
+        }
+
+        .relationship {
+            stroke: #333;
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+        }
+
+        .inheritance {
+            stroke: #667eea;
+            stroke-width: 2;
+            marker-end: url(#triangle);
+        }
+
+        .composition {
+            stroke: #764ba2;
+            stroke-width: 2;
+            marker-start: url(#diamond);
+        }
+
+        text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .note {
+            fill: #fff9c4;
+            stroke: #f9a825;
+            stroke-width: 2;
+        }
+
+        .legend {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .legend h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .tabs {
+                display: none;
+            }
+            .diagram-container {
+                display: block !important;
+                page-break-after: always;
+            }
+        }
+    
