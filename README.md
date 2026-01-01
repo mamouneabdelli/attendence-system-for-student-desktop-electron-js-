@@ -1,4 +1,6 @@
 Attendance System - Electron Desktop Application
+
+
 📋 Overview
 A modern desktop application built with Electron.js for managing student attendance through QR code scanning. This system includes two dashboards: one for professors to track attendance and another for administrators to manage the entire system.
 
