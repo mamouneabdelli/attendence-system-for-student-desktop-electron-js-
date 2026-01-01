@@ -1,12 +1,54 @@
 {
   "name": "dashprof",
   "version": "1.0.0",
-  "main": "main.js",
+  "description": "Professor Dashboard - Attendance Management System",
+  "main": "main1.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "dist": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.dashprof.attendance",
+    "productName": "Professor Dashboard",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "!dist/**/*",
+      "!README.md"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Education"
+    }
   },
   "devDependencies": {
-    "electron": "^28.0.0"
-  }
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "author": "Your Name",
+  "license": "MIT"
 }
