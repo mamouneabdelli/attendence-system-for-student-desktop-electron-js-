@@ -13,33 +13,27 @@ let justifications = [
 
 let dailyCode = "";
 let currentJustificationFilter = 'all';
-let apiBaseUrl = "http://localhost:8000/api"; // Change this to your Laravel API URL
 
-// API Configuration
-const apiConfig = {
-  baseUrl: "http://localhost:8000/api",
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
+// Toast notification function
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast-notification');
+  toast.textContent = message;
+  toast.className = `toast-notification show ${type}`;
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+// Custom confirm dialog
+function customConfirm(message, callback) {
+  if (confirm(message)) {
+    callback();
   }
-};
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   init();
-  // Test API connection on startup
-  // testApiConnection();
 });
-
-async function testApiConnection() {
-  try {
-    const response = await fetch(`${apiConfig.baseUrl}/test`);
-    if (response.ok) {
-      console.log("API Connection Successful");
-    }
-  } catch (error) {
-    console.warn("API not available, using local data:", error);
-  }
-}
 
 function init() {
   generateQRCode();
@@ -50,8 +44,26 @@ function init() {
   updateJustificationBadge();
   setInterval(updateCodeTimer, 1000);
   
-  // Load settings from localStorage
-  loadSettings();
+  initSearchListeners();
+  
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = document.getElementById('justification-date');
+  if (dateInput) {
+    dateInput.value = today;
+  }
+}
+
+function initSearchListeners() {
+  const studentSearch = document.getElementById('student-search');
+  const excludedSearch = document.getElementById('excluded-search');
+  
+  if (studentSearch) {
+    studentSearch.addEventListener('input', filterStudents);
+  }
+  
+  if (excludedSearch) {
+    excludedSearch.addEventListener('input', filterExcluded);
+  }
 }
 
 function showSection(sectionId) {
@@ -63,11 +75,15 @@ function showSection(sectionId) {
     el.classList.remove('active');
   });
   
-  document.getElementById(sectionId + '-section').style.display = 'block';
+  const section = document.getElementById(sectionId + '-section');
+  if (section) {
+    section.style.display = 'block';
+  }
   
   const activeNav = Array.from(document.querySelectorAll('.nav-link')).find(el => 
-    el.textContent.toLowerCase().includes(sectionId)
+    el.getAttribute('onclick')?.includes(sectionId)
   );
+  
   if (activeNav) {
     activeNav.classList.add('active');
   }
@@ -94,7 +110,7 @@ function generateQRCode() {
   });
   
   updateDashboard();
-  alert("New QR code generated! All students marked as absent.");
+  showToast("New QR code generated! All students marked as absent.", "info");
 }
 
 function updateCodeTimer() {
@@ -141,11 +157,11 @@ function renderStudentsList() {
     container.innerHTML = active.map(s => {
       const hasJustification = justifications.some(j => j.studentId === s.id && j.status === 'pending');
       return `
-      <div class="student-item">
+      <div class="student-item" id="student-${s.id}">
         <div>
           <strong>${s.name}</strong><br>
           <small class="text-muted">${s.code}</small>
-          ${hasJustification ? '<span class="badge bg-warning ms-2"><i class="fas fa-file-alt"></i> Pending Justification</span>' : ''}
+          ${hasJustification ? '<span class="badge bg-warning ms-2"><i class="fas fa-file-alt"></i> Pending</span>' : ''}
         </div>
         <div>
           <span class="badge-status ${s.status === 'present' ? 'badge-present' : 'badge-absent'}">
@@ -157,13 +173,13 @@ function renderStudentsList() {
           <button class="btn-action btn-mark-absent ms-1" onclick="markAttendance(${s.id}, 'absent')" title="Mark Absent">
             <i class="fas fa-times"></i>
           </button>
-          <button class="btn btn-sm btn-info ms-1" onclick="submitJustification(${s.id})" title="Submit Justification">
+          <button class="btn btn-sm btn-info ms-1" onclick="showSubmitJustificationModal(${s.id})" title="Submit Justification">
             <i class="fas fa-file-alt"></i>
           </button>
-          <button class="btn btn-sm btn-warning ms-1" onclick="toggleExclude(${s.id})" title="Exclude Student">
+          <button class="btn btn-sm btn-warning ms-1" onclick="toggleExclude(${s.id})" title="Exclude">
             <i class="fas fa-user-slash"></i>
           </button>
-          <button class="btn btn-sm btn-danger ms-1" onclick="deleteStudent(${s.id})" title="Delete Student">
+          <button class="btn btn-sm btn-danger ms-1" onclick="deleteStudent(${s.id})" title="Delete">
             <i class="fas fa-trash"></i>
           </button>
         </div>
@@ -174,69 +190,114 @@ function renderStudentsList() {
 }
 
 function filterStudents() {
-  const search = document.getElementById('student-search').value.toLowerCase();
-  const filtered = students.filter(s => !s.excluded && 
-    (s.name.toLowerCase().includes(search) || s.code.toLowerCase().includes(search)));
+  const searchInput = document.getElementById('student-search');
+  if (!searchInput) return;
   
-  const container = document.getElementById('students-list');
-  if (filtered.length === 0) {
-    container.innerHTML = '<p class="text-muted">No students found</p>';
+  const search = searchInput.value.toLowerCase();
+  const activeStudents = students.filter(s => !s.excluded);
+  
+  if (search.trim() === '') {
+    renderStudentsList();
     return;
   }
   
-  container.innerHTML = filtered.map(s => `
-    <div class="student-item">
-      <div>
-        <strong>${s.name}</strong><br>
-        <small class="text-muted">${s.code}</small>
+  const filtered = activeStudents.filter(s => 
+    s.name.toLowerCase().includes(search) || 
+    s.code.toLowerCase().includes(search)
+  );
+  
+  const container = document.getElementById('students-list');
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="text-muted">No students found</p>';
+  } else {
+    container.innerHTML = filtered.map(s => {
+      const hasJustification = justifications.some(j => j.studentId === s.id && j.status === 'pending');
+      return `
+      <div class="student-item">
+        <div>
+          <strong>${s.name}</strong><br>
+          <small class="text-muted">${s.code}</small>
+          ${hasJustification ? '<span class="badge bg-warning ms-2"><i class="fas fa-file-alt"></i> Pending</span>' : ''}
+        </div>
+        <div>
+          <span class="badge-status ${s.status === 'present' ? 'badge-present' : 'badge-absent'}">
+            ${s.status === 'present' ? 'Present' : 'Absent'}
+          </span>
+          <button class="btn-action btn-mark-present ms-1" onclick="markAttendance(${s.id}, 'present')">
+            <i class="fas fa-check"></i>
+          </button>
+          <button class="btn-action btn-mark-absent ms-1" onclick="markAttendance(${s.id}, 'absent')">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
-      <div>
-        <span class="badge-status ${s.status === 'present' ? 'badge-present' : 'badge-absent'}">
-          ${s.status === 'present' ? 'Present' : 'Absent'}
-        </span>
-        <button class="btn-action btn-mark-present ms-1" onclick="markAttendance(${s.id}, 'present')">
-          <i class="fas fa-check"></i>
-        </button>
-        <button class="btn-action btn-mark-absent ms-1" onclick="markAttendance(${s.id}, 'absent')">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-  `).join('');
+    `}).join('');
+  }
 }
 
 function markAttendance(id, status) {
   const student = students.find(s => s.id === id);
   if (student) { 
     student.status = status; 
-    renderStudentsList(); 
+    renderStudentsList();
+    showToast(`${student.name} marked as ${status}`, 'success');
+  }
+}
+
+function showAddStudentModal() {
+  document.getElementById('new-student-name').value = '';
+  document.getElementById('new-student-code').value = '';
+  document.getElementById('addStudentModal').style.display = 'block';
+}
+
+function closeAddStudentModal(event) {
+  if (event && event.target.classList.contains('modal-overlay')) {
+    document.getElementById('addStudentModal').style.display = 'none';
+  } else if (!event) {
+    document.getElementById('addStudentModal').style.display = 'none';
   }
 }
 
 function addStudent() {
-  const name = prompt("Enter student name:");
-  if (!name) return;
+  const name = document.getElementById('new-student-name').value.trim();
+  if (!name) {
+    showToast('Please enter a student name', 'error');
+    return;
+  }
   
-  const code = prompt("Enter student code (or leave blank for auto-generate):");
-  const finalCode = code || "STD" + String(students.length + 1).padStart(3, '0');
+  const code = document.getElementById('new-student-code').value.trim();
+  let finalCode = code || "STD" + String(students.length + 1).padStart(3, '0');
   
-  students.push({ 
+  let counter = 1;
+  while (students.some(s => s.code === finalCode)) {
+    finalCode = "STD" + String(students.length + 1 + counter).padStart(3, '0');
+    counter++;
+  }
+  
+  const newStudent = { 
     id: Date.now(), 
-    name, 
+    name: name, 
     code: finalCode, 
     status: "absent", 
     excluded: false 
-  });
+  };
   
+  students.push(newStudent);
   renderStudentsList();
-  alert("Student added successfully!");
+  closeAddStudentModal();
+  showToast('Student added successfully!', 'success');
 }
 
 function deleteStudent(id) {
-  if (confirm("Are you sure you want to delete this student?")) {
-    students = students.filter(s => s.id !== id);
-    renderStudentsList();
-    renderExcludedList();
+  const student = students.find(s => s.id === id);
+  if (student) {
+    customConfirm("Are you sure you want to delete this student?", () => {
+      students = students.filter(s => s.id !== id);
+      renderStudentsList();
+      renderExcludedList();
+      showToast('Student deleted', 'success');
+    });
   }
 }
 
@@ -248,26 +309,53 @@ function toggleExclude(id) {
     renderExcludedList(); 
     
     if (student.excluded) {
-      alert(`${student.name} has been excluded from attendance tracking.`);
+      showToast(`${student.name} excluded from tracking`, 'info');
     } else {
-      alert(`${student.name} has been restored to attendance tracking.`);
+      showToast(`${student.name} restored to tracking`, 'success');
     }
   }
 }
 
-function submitJustification(studentId) {
+function showSubmitJustificationModal(studentId) {
   const student = students.find(s => s.id === studentId);
   if (!student) return;
   
-  const reason = prompt("Enter justification reason:");
-  if (!reason) return;
+  document.getElementById('justification-student-id').value = studentId;
+  document.getElementById('justification-reason').value = '';
+  document.getElementById('justification-has-doc').checked = false;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('justification-date').value = today;
+  document.getElementById('justificationSubmitModal').style.display = 'block';
+}
+
+function closeJustificationSubmitModal(event) {
+  if (event && event.target.classList.contains('modal-overlay')) {
+    document.getElementById('justificationSubmitModal').style.display = 'none';
+  } else if (!event) {
+    document.getElementById('justificationSubmitModal').style.display = 'none';
+  }
+}
+
+function submitJustification() {
+  const studentId = parseInt(document.getElementById('justification-student-id').value);
+  const student = students.find(s => s.id === studentId);
+  if (!student) return;
   
-  const date = prompt("Enter absence date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-  if (!date) return;
+  const reason = document.getElementById('justification-reason').value.trim();
+  if (!reason) {
+    showToast('Please enter a reason', 'error');
+    return;
+  }
   
-  const hasDocument = confirm("Do you have a supporting document? (This is a simulation - click OK if yes)");
+  const date = document.getElementById('justification-date').value;
+  if (!date) {
+    showToast('Please select a date', 'error');
+    return;
+  }
   
-  justifications.push({
+  const hasDocument = document.getElementById('justification-has-doc').checked;
+  
+  const newJustification = {
     id: Date.now(),
     studentId: student.id,
     studentName: student.name,
@@ -276,12 +364,14 @@ function submitJustification(studentId) {
     document: hasDocument ? "document_" + Date.now() + ".pdf" : null,
     status: "pending",
     submittedAt: new Date().toLocaleString()
-  });
+  };
   
+  justifications.push(newJustification);
   renderJustificationsList();
   updateJustificationBadge();
   renderStudentsList();
-  alert("Justification submitted successfully!");
+  closeJustificationSubmitModal();
+  showToast('Justification submitted successfully!', 'success');
 }
 
 function renderJustificationsList() {
@@ -339,13 +429,13 @@ function handleJustification(id, action) {
   const justification = justifications.find(j => j.id === id);
   if (!justification) return;
   
-  if (confirm(`Are you sure you want to ${action} this justification?`)) {
+  customConfirm(`Are you sure you want to ${action} this justification?`, () => {
     justification.status = action;
     renderJustificationsList();
     updateJustificationBadge();
     renderStudentsList();
-    alert(`Justification ${action} successfully!`);
-  }
+    showToast(`Justification ${action}!`, 'success');
+  });
 }
 
 function viewJustificationDetails(id) {
@@ -354,32 +444,34 @@ function viewJustificationDetails(id) {
   
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
-    <div class="mb-3">
-      <strong>Student:</strong> ${justification.studentName}
-    </div>
-    <div class="mb-3">
-      <strong>Absence Date:</strong> ${justification.date}
-    </div>
-    <div class="mb-3">
-      <strong>Submitted At:</strong> ${justification.submittedAt}
-    </div>
-    <div class="mb-3">
-      <strong>Reason:</strong><br>
-      <p class="mt-2">${justification.reason}</p>
-    </div>
-    ${justification.document ? `
+    <div class="modal-body-content">
       <div class="mb-3">
-        <strong>Document:</strong><br>
-        <a href="#" class="btn btn-sm btn-outline-primary mt-2">
-          <i class="fas fa-download"></i> Download ${justification.document}
-        </a>
+        <strong>Student:</strong> ${justification.studentName}
       </div>
-    ` : '<div class="mb-3"><em>No document attached</em></div>'}
-    <div class="mb-3">
-      <strong>Status:</strong> 
-      <span class="badge-status badge-${justification.status === 'pending' ? 'pending' : justification.status === 'approved' ? 'present' : 'absent'}">
-        ${justification.status.toUpperCase()}
-      </span>
+      <div class="mb-3">
+        <strong>Absence Date:</strong> ${justification.date}
+      </div>
+      <div class="mb-3">
+        <strong>Submitted At:</strong> ${justification.submittedAt}
+      </div>
+      <div class="mb-3">
+        <strong>Reason:</strong><br>
+        <p class="mt-2 p-2 bg-light rounded">${justification.reason}</p>
+      </div>
+      ${justification.document ? `
+        <div class="mb-3">
+          <strong>Document:</strong><br>
+          <a href="#" class="btn btn-sm btn-outline-primary mt-2">
+            <i class="fas fa-download"></i> ${justification.document}
+          </a>
+        </div>
+      ` : '<div class="mb-3"><em>No document attached</em></div>'}
+      <div class="mb-3">
+        <strong>Status:</strong> 
+        <span class="badge-status badge-${justification.status === 'pending' ? 'pending' : justification.status === 'approved' ? 'present' : 'absent'}">
+          ${justification.status.toUpperCase()}
+        </span>
+      </div>
     </div>
   `;
   
@@ -387,7 +479,9 @@ function viewJustificationDetails(id) {
 }
 
 function closeModal(event) {
-  if (!event || event.target.classList.contains('modal-overlay')) {
+  if (event && event.target.classList.contains('modal-overlay')) {
+    document.getElementById('justificationModal').style.display = 'none';
+  } else if (!event) {
     document.getElementById('justificationModal').style.display = 'none';
   }
 }
@@ -395,11 +489,13 @@ function closeModal(event) {
 function updateJustificationBadge() {
   const pending = justifications.filter(j => j.status === 'pending').length;
   const badge = document.getElementById('justification-badge');
-  if (pending > 0) {
-    badge.textContent = pending;
-    badge.style.display = 'flex';
-  } else {
-    badge.style.display = 'none';
+  if (badge) {
+    if (pending > 0) {
+      badge.textContent = pending;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
   }
 }
 
@@ -407,38 +503,51 @@ function renderExcludedList() {
   const excluded = students.filter(s => s.excluded);
   const el = document.getElementById('excluded-list');
   const noEl = document.getElementById('no-excluded');
+  
   if (excluded.length === 0) {
     el.innerHTML = '';
-    noEl.style.display = 'block';
+    if (noEl) noEl.style.display = 'block';
   } else {
     el.innerHTML = excluded.map(s => `
       <div class="student-item">
         <div><strong>${s.name}</strong><br><small class="text-muted">${s.code}</small></div>
         <div>
-          <button class="btn btn-sm btn-success" onclick="toggleExclude(${s.id})" title="Restore Student">
+          <button class="btn btn-sm btn-success" onclick="toggleExclude(${s.id})" title="Restore">
             <i class="fas fa-undo"></i> Restore
           </button>
-          <button class="btn btn-sm btn-danger ms-1" onclick="deleteStudent(${s.id})" title="Delete Permanently">
+          <button class="btn btn-sm btn-danger ms-1" onclick="deleteStudent(${s.id})" title="Delete">
             <i class="fas fa-trash"></i>
           </button>
         </div>
       </div>
     `).join('');
-    noEl.style.display = 'none';
+    if (noEl) noEl.style.display = 'none';
   }
 }
 
 function filterExcluded() {
-  const search = document.getElementById('excluded-search').value.toLowerCase();
-  const filtered = students.filter(s => s.excluded && 
-    (s.name.toLowerCase().includes(search) || s.code.toLowerCase().includes(search)));
+  const searchInput = document.getElementById('excluded-search');
+  if (!searchInput) return;
+  
+  const search = searchInput.value.toLowerCase();
+  const excludedStudents = students.filter(s => s.excluded);
+  
+  if (search.trim() === '') {
+    renderExcludedList();
+    return;
+  }
+  
+  const filtered = excludedStudents.filter(s => 
+    s.name.toLowerCase().includes(search) || 
+    s.code.toLowerCase().includes(search)
+  );
   
   const el = document.getElementById('excluded-list');
   const noEl = document.getElementById('no-excluded');
   
   if (filtered.length === 0) {
     el.innerHTML = '';
-    noEl.style.display = 'block';
+    if (noEl) noEl.style.display = 'block';
   } else {
     el.innerHTML = filtered.map(s => `
       <div class="student-item">
@@ -453,7 +562,7 @@ function filterExcluded() {
         </div>
       </div>
     `).join('');
-    noEl.style.display = 'none';
+    if (noEl) noEl.style.display = 'none';
   }
 }
 
@@ -469,8 +578,11 @@ function exportData() {
   const link = document.createElement('a');
   link.href = url;
   link.download = 'attendance_data.json';
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
   URL.revokeObjectURL(url);
+  showToast('Data exported successfully!', 'success');
 }
 
 function saveSettings() {
@@ -478,134 +590,13 @@ function saveSettings() {
   const academicYear = document.getElementById('academic-year').value;
   localStorage.setItem('schoolName', schoolName);
   localStorage.setItem('academicYear', academicYear);
-  alert('Settings saved successfully!');
+  showToast('Settings saved successfully!', 'success');
 }
 
-function loadSettings() {
-  const schoolName = localStorage.getItem('schoolName');
-  const academicYear = localStorage.getItem('academicYear');
-  
-  if (schoolName) {
-    document.getElementById('school-name').value = schoolName;
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeModal();
+    closeAddStudentModal();
+    closeJustificationSubmitModal();
   }
-  if (academicYear) {
-    document.getElementById('academic-year').value = academicYear;
-  }
-}
-
-// ==================== API FUNCTIONS ====================
-// These are the functions you'll use to connect to your Laravel backend
-
-async function fetchStudents() {
-  try {
-    const response = await fetch(`${apiConfig.baseUrl}/students`, {
-      method: 'GET',
-      headers: apiConfig.headers
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      students = data; // Replace local data with API data
-      renderStudentsList();
-      return true;
-    }
-  } catch (error) {
-    console.error("Error fetching students:", error);
-    return false;
-  }
-}
-
-async function addStudentAPI(studentData) {
-  try {
-    const response = await fetch(`${apiConfig.baseUrl}/students`, {
-      method: 'POST',
-      headers: apiConfig.headers,
-      body: JSON.stringify(studentData)
-    });
-    
-    if (response.ok) {
-      const newStudent = await response.json();
-      students.push(newStudent);
-      renderStudentsList();
-      return true;
-    }
-  } catch (error) {
-    console.error("Error adding student:", error);
-    return false;
-  }
-}
-
-async function updateAttendanceAPI(studentId, status) {
-  try {
-    const response = await fetch(`${apiConfig.baseUrl}/attendance/${studentId}`, {
-      method: 'PUT',
-      headers: apiConfig.headers,
-      body: JSON.stringify({ status: status })
-    });
-    
-    if (response.ok) {
-      return true;
-    }
-  } catch (error) {
-    console.error("Error updating attendance:", error);
-    return false;
-  }
-}
-
-async function fetchJustifications() {
-  try {
-    const response = await fetch(`${apiConfig.baseUrl}/justifications`, {
-      method: 'GET',
-      headers: apiConfig.headers
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      justifications = data;
-      renderJustificationsList();
-      updateJustificationBadge();
-      return true;
-    }
-  } catch (error) {
-    console.error("Error fetching justifications:", error);
-    return false;
-  }
-}
-
-async function submitJustificationAPI(justificationData) {
-  try {
-    const response = await fetch(`${apiConfig.baseUrl}/justifications`, {
-      method: 'POST',
-      headers: apiConfig.headers,
-      body: JSON.stringify(justificationData)
-    });
-    
-    if (response.ok) {
-      const newJustification = await response.json();
-      justifications.push(newJustification);
-      renderJustificationsList();
-      updateJustificationBadge();
-      return true;
-    }
-  } catch (error) {
-    console.error("Error submitting justification:", error);
-    return false;
-  }
-}
-
-async function handleJustificationAPI(justificationId, action) {
-  try {
-    const response = await fetch(`${apiConfig.baseUrl}/justifications/${justificationId}`, {
-      method: 'PUT',
-      headers: apiConfig.headers,
-      body: JSON.stringify({ status: action })
-    });
-    
-    if (response.ok) {
-      return true;
-    }
-  } catch (error) {
-    console.error("Error handling justification:", error);
-    return false;
-  }
-}
+});
