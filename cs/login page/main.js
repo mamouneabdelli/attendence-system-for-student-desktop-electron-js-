@@ -1,25 +1,16 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
 
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-  
-  });
+let win
 
-  win.loadFile('index.html');
+function createWindow () {
+  win = new BrowserWindow({
+    width: 1000,
+    height: 700
+  })
+
+  // تحميل صفحة تسجيل الدخول
+  win.loadFile(path.join(__dirname, 'pages/login/index.html'))
 }
 
-app.whenReady().then(createWindow);
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-});
+app.whenReady().then(createWindow)
