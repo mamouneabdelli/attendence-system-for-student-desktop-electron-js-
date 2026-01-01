@@ -297,3 +297,48 @@ h5 {
   justify-content: center;
   font-weight: 600;
 }
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 1rem 1.5rem;
+  min-width: 250px;
+  z-index: 9999;
+  display: none;
+  animation: slideIn 0.3s ease-out;
+}
+
+.toast-notification.show {
+  display: block;
+}
+
+.toast-notification.success {
+  border-left: 4px solid #198754;
+}
+
+.toast-notification.error {
+  border-left: 4px solid #dc3545;
+}
+
+.toast-notification.warning {
+  border-left: 4px solid #ffc107;
+}
+
+.toast-notification.info {
+  border-left: 4px solid #0dcaf0;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
