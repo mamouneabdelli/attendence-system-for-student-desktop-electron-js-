@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management System - Activity Diagrams</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 18px 30px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .diagram-container {
+            display: none;
+        }
+
+        .diagram-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .diagram-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .diagram-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+            line-height: 1.8;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .start-end {
+            fill: #667eea;
+            stroke: #667eea;
+            stroke-width: 2;
+        }
+
+        .activity {
+            fill: #e3f2fd;
+            stroke: #2196F3;
+            stroke-width: 2;
+        }
+
+        .decision {
+            fill: #fff9c4;
+            stroke: #f57c00;
+            stroke-width: 2;
+        }
+
+        .flow-line {
+            stroke: #333;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+
+        .yes-flow {
+            stroke: #4caf50;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead-yes);
+        }
+
+        .no-flow {
+            stroke: #f44336;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead-no);
+        }
+
+        .activity-text {
+            font-size: 14px;
+            fill: #333;
+            text-anchor: middle;
+        }
+
+        .decision-text {
+            font-size: 13px;
+            fill: #333;
+            text-anchor: middle;
+        }
+
+        .flow-label {
+            font-size: 13px;
+            fill: #555;
+            font-weight: 600;
+        }
+
+        .swimlane {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 2;
+            stroke-dasharray: 5,5;
+        }
+
+        .swimlane-label {
+            font-size: 16px;
+            font-weight: bold;
+            fill: #667eea;
+        }
+
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .legend h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .legend-shape {
+            width: 40px;
+            height: 30px;
+            margin-right: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Attendance Management System</h1>
+            <p>Activity Diagrams</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showDiagram(0)">Mark Attendance</button>
+            <button class="tab" onclick="showDiagram(1)">View Attendance Info</button>
+            <button class="tab" onclick="showDiagram(2)">Create Session</button>
+        </div>
+
+        <div class="content">
+            <!-- Mark Attendance Activity Diagram -->
+            <div class="diagram-container active">
+                <h2 class="diagram-title">🎯 Mark Attendance - Activity Diagram</h2>
+                <div class="diagram-description">
+                    <strong>Process:</strong> Student marks attendance by scanning QR code and selecting session.
+                    <br><strong>Decision Points:</strong> Time validity check (within 30 minutes of session start)
+                    <br><strong>Outcome:</strong> Attendance recorded or error message displayed
+                    <br><strong>Swimlanes:</strong> Student actions and System processes
+                </div>
+                
+                <svg viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#333"/>
+                        </marker>
+                        <marker id="arrowhead-yes" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#4caf50"/>
+                        </marker>
+                        <marker id="arrowhead-no" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#f44336"/>
+                        </marker>
+                    </defs>
+                    
+                    <!-- Swimlanes -->
+                    <line x1="400" y1="0" x2="400" y2="1000" class="swimlane"/>
+                    <text x="200" y="30" class="swimlane-label">Student</text>
+                    <text x="600" y="30" class="swimlane-label">System</text>
+                    
+                    <!-- Start -->
+                    <ellipse cx="200" cy="70" rx="40" ry="25" class="start-end"/>
+                    <text x="200" y="77" class="activity-text" fill="white" font-weight="bold">Start</text>
+                    
+                    <!-- Click Mark Attendance -->
+                    <rect x="120" y="120" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="145" class="activity-text">Click "Mark</text>
+                    <text x="200" y="165" class="activity-text">Attendance"</text>
+                    
+                    <!-- Flow to System -->
+                    <line x1="200" y1="95" x2="200" y2="120" class="flow-line"/>
+                    <line x1="200" y1="180" x2="200" y2="220" class="flow-line"/>
+                    <line x1="200" y1="220" x2="600" y2="220" class="flow-line"/>
+                    <line x1="600" y1="220" x2="600" y2="250" class="flow-line"/>
+                    
+                    <!-- Retrieve Active Sessions -->
+                    <rect x="520" y="250" width="160" height="60" rx="10" class="activity"/>
+                    <text x="600" y="275" class="activity-text">Retrieve & Display</text>
+                    <text x="600" y="295" class="activity-text">Active Sessions</text>
+                    
+                    <!-- Flow back to Student -->
+                    <line x1="600" y1="310" x2="600" y2="350" class="flow-line"/>
+                    <line x1="600" y1="350" x2="200" y2="350" class="flow-line"/>
+                    <line x1="200" y1="350" x2="200" y2="380" class="flow-line"/>
+                    
+                    <!-- Select Session -->
+                    <rect x="120" y="380" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="415" class="activity-text">Select Session</text>
+                    
+                    <!-- Flow to System validation -->
+                    <line x1="200" y1="440" x2="200" y2="480" class="flow-line"/>
+                    <line x1="200" y1="480" x2="600" y2="480" class="flow-line"/>
+                    <line x1="600" y1="480" x2="600" y2="510" class="flow-line"/>
+                    
+                    <!-- Validate Session -->
+                    <rect x="520" y="510" width="160" height="60" rx="10" class="activity"/>
+                    <text x="600" y="535" class="activity-text">Validate Session</text>
+                    <text x="600" y="555" class="activity-text">Availability</text>
+                    
+                    <!-- Decision Diamond -->
+                    <line x1="600" y1="570" x2="600" y2="600" class="flow-line"/>
+                    <polygon points="600,600 650,650 600,700 550,650" class="decision"/>
+                    <text x="600" y="645" class="decision-text">Within 30</text>
+                    <text x="600" y="660" class="decision-text">minutes?</text>
+                    
+                    <!-- Yes path - Record Attendance -->
+                    <line x1="600" y1="700" x2="600" y2="740" class="yes-flow"/>
+                    <text x="610" y="720" class="flow-label" fill="#4caf50">Yes</text>
+                    
+                    <rect x="520" y="740" width="160" height="60" rx="10" class="activity"/>
+                    <text x="600" y="765" class="activity-text">Record Attendance</text>
+                    <text x="600" y="785" class="activity-text">in Database</text>
+                    
+                    <!-- Success message -->
+                    <line x1="600" y1="800" x2="600" y2="840" class="flow-line"/>
+                    <line x1="600" y1="840" x2="200" y2="840" class="flow-line"/>
+                    <line x1="200" y1="840" x2="200" y2="870" class="flow-line"/>
+                    
+                    <rect x="120" y="870" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="895" class="activity-text">Display Success</text>
+                    <text x="200" y="915" class="activity-text">Message</text>
+                    
+                    <!-- No path - Error Message -->
+                    <line x1="550" y1="650" x2="200" y2="650" class="no-flow"/>
+                    <text x="370" y="640" class="flow-label" fill="#f44336">No</text>
+                    <line x1="200" y1="650" x2="200" y2="740" class="no-flow"/>
+                    
+                    <rect x="120" y="740" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="760" class="activity-text">Display Error:</text>
+                    <text x="200" y="775" class="activity-text" fill="#d32f2f">"Time Limit</text>
+                    <text x="200" y="790" class="activity-text" fill="#d32f2f">Exceeded"</text>
+                    
+                    <!-- Merge paths -->
+                    <line x1="200" y1="800" x2="200" y2="840" class="flow-line"/>
+                    
+                    <!-- End -->
+                    <line x1="200" y1="930" x2="200" y2="960" class="flow-line"/>
+                    <ellipse cx="200" cy="970" rx="40" ry="25" class="start-end"/>
+                    <text x="200" y="977" class="activity-text" fill="white" font-weight="bold">End</text>
+                </svg>
+
+                <div class="legend">
+                    <h3>📌 Activity Diagram Elements</h3>
+                    <div class="legend-item">
+                        <div class="legend-shape" style="background: #667eea; border-radius: 50%;"></div>
+                        <span><strong>Start/End Node:</strong> Represents the beginning and end of the process</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-shape" style="background: #e3f2fd; border: 2px solid #2196F3;"></div>
+                        <span><strong>Activity:</strong> Action or process step performed by actor or system</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-shape decision" style="background: #fff9c4; border: 2px solid #f57c00; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);"></div>
+                        <span><strong>Decision Node:</strong> Conditional branching point in the workflow</span>
+                    </div>
+                    <div class="legend-item">
+                        <div style="width: 40px; height: 2px; background: #4caf50; margin-right: 15px;"></div>
+                        <span><strong>Yes Flow:</strong> Condition is true</span>
+                    </div>
+                    <div class="legend-item">
+                        <div style="width: 40px; height: 2px; background: #f44336; margin-right: 15px;"></div>
+                        <span><strong>No Flow:</strong> Condition is false</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Attendance Information Activity Diagram -->
+            <div class="diagram-container">
+                <h2 class="diagram-title">📋 View Attendance Information - Activity Diagram</h2>
+                <div class="diagram-description">
+                    <strong>Process:</strong> Student views personal attendance records and statistics.
+                    <br><strong>Decision Points:</strong> Optional selection to view detailed module information or full report
+                    <br><strong>Outcome:</strong> Display attendance summary, details by module, or complete report
+                    <br><strong>Swimlanes:</strong> Student actions and System data retrieval/display
+                </div>
+                
+                <svg viewBox="0 0 800 1100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Swimlanes -->
+                    <line x1="400" y1="0" x2="400" y2="1100" class="swimlane"/>
+                    <text x="200" y="30" class="swimlane-label">Student</text>
+                    <text x="600" y="30" class="swimlane-label">System</text>
+                    
+                    <!-- Start -->
+                    <ellipse cx="200" cy="70" rx="40" ry="25" class="start-end"/>
+                    <text x="200" y="77" class="activity-text" fill="white" font-weight="bold">Start</text>
+                    
+                    <!-- Select My Attendance -->
+                    <rect x="120" y="120" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="145" class="activity-text">Select "My</text>
+                    <text x="200" y="165" class="activity-text">Attendance"</text>
+                    
+                    <line x1="200" y1="95" x2="200" y2="120" class="flow-line"/>
+                    <line x1="200" y1="180" x2="200" y2="220" class="flow-line"/>
+                    <line x1="200" y1="220" x2="600" y2="220" class="flow-line"/>
+                    <line x1="600" y1="220" x2="600" y2="250" class="flow-line"/>
+                    
+                    <!-- Retrieve Summary Data -->
+                    <rect x="520" y="250" width="160" height="60" rx="10" class="activity"/>
+                    <text x="600" y="275" class="activity-text">Retrieve Attendance</text>
+                    <text x="600" y="295" class="activity-text">Summary from DB</text>
+                    
+                    <line x1="600" y1="310" x2="600" y2="340" class="flow-line"/>
+                    
+                    <!-- Display Summary -->
+                    <rect x="520" y="340" width="160" height="60" rx="10" class="activity"/>
+                    <text x="600" y="365" class="activity-text">Display Modules &</text>
+                    <text x="600" y="385" class="activity-text">Percentages</text>
+                    
+                    <line x1="600" y1="400" x2="600" y2="440" class="flow-line"/>
+                    <line x1="600" y1="440" x2="200" y2="440" class="flow-line"/>
+                    <line x1="200" y1="440" x2="200" y2="470" class="flow-line"/>
+                    
+                    <!-- Decision: View Details? -->
+                    <polygon points="200,470 250,520 200,570 150,520" class="decision"/>
+                    <text x="200" y="515" class="decision-text">View Module</text>
+                    <text x="200" y="530" class="decision-text">Details?</text>
+                    
+                    <!-- Yes path -->
+                    <line x1="250" y1="520" x2="320" y2="520" class="yes-flow"/>
+                    <line x1="320" y1="520" x2="320" y2="620" class="yes-flow"/>
+                    <text x="260" y="515" class="flow-label" fill="#4caf50">Yes</text>
+                    
+                    <rect x="240" y="620" width="160" height="60" rx="10" class="activity"/>
+                    <text x="320" y="645" class="activity-text">Select Specific</text>
+                    <text x="320" y="665" class="activity-text">Module</text>
+                    
+                    <line x1="320" y1="680" x2="320" y2="710" class="flow-line"/>
+                    <line x1="320" y1="710" x2="600" y2="710" class="flow-line"/>
+                    <line x1="600" y1="710" x2="600" y2="740" class="flow-line"/>
+                    
+                    <!-- Get Detailed Records -->
+                    <rect x="520" y="740" width="160" height="60" rx="10" class="activity"/>
+                    <text x="600" y="765" class="activity-text">Retrieve Detailed</text>
+                    <text x="600" y="785" class="activity-text">Records from DB</text>
+                    
+                    <line x1="600" y1="800" x2="600" y2="830" class="flow-line"/>
+                    
+                    <!-- Display Details -->
+                    <rect x="520" y="830" width="160" height="60" rx="10" class="activity"/>
+                    <text x="600" y="850" class="activity-text">Display Sessions,</text>
+                    <text x="600" y="865" class="activity-text">Dates, & Status</text>
+                    
+                    <line x1="600" y1="890" x2="600" y2="930" class="flow-line"/>
+                    <line x1="600" y1="930" x2="200" y2="930" class="flow-line"/>
+                    <line x1="200" y1="930" x2="200" y2="960" class="flow-line"/>
+                    
+                    <!-- No path - merge point -->
+                    <line x1="200" y1="570" x2="200" y2="780" class="flow-line"/>
+                    <text x="130" y="670" class="flow-label" fill="#666">No</text>
+                    
+                    <!-- Decision: View Full Report? -->
+                    <polygon points="200,780 250,830 200,880 150,830" class="decision"/>
+                    <text x="200" y="825" class="decision-text">View Full</text>
+                    <text x="200" y="840" class="decision-text">Report?</text>
+                    
+                    <!-- Yes to full report -->
+                    <line x1="250" y1="830" x2="600" y2="830" class="yes-flow"/>
+                    <text x="420" y="820" class="flow-label" fill="#4caf50">Yes</text>
+                    
+                    <!-- No to end -->
+                    <line x1="200" y1="880" x2="200" y2="960" class="flow-line"/>
+                    <text x="130" y="920" class="flow-label" fill="#666">No</text>
+                    
+                    <!-- Merge point -->
+                    <circle cx="200" cy="960" r="8" fill="#333"/>
+                    
+                    <!-- End -->
+                    <line x1="200" y1="968" x2="200" y2="1010" class="flow-line"/>
+                    <ellipse cx="200" cy="1030" rx="40" ry="25" class="start-end"/>
+                    <text x="200" y="1037" class="activity-text" fill="white" font-weight="bold">End</text>
+                </svg>
+            </div>
+
+            <!-- Create Session Activity Diagram -->
+            <div class="diagram-container">
+                <h2 class="diagram-title">🏫 Create Class Session - Activity Diagram</h2>
+                <div class="diagram-description">
+                    <strong>Process:</strong> Teacher creates a new class session with validation checks.
+                    <br><strong>Decision Points:</strong> Teacher authorization check and scheduling conflict detection
+                    <br><strong>Outcome:</strong> Session created successfully or error message for conflicts/unauthorized access
+                    <br><strong>Swimlanes:</strong> Teacher actions and System validation/storage
+                </div>
+                
+                <svg viewBox="0 0 900 1150" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Swimlanes -->
+                    <line x1="400" y1="0" x2="400" y2="1150" class="swimlane"/>
+                    <text x="200" y="30" class="swimlane-label">Teacher</text>
+                    <text x="650" y="30" class="swimlane-label">System</text>
+                    
+                    <!-- Start -->
+                    <ellipse cx="200" cy="70" rx="40" ry="25" class="start-end"/>
+                    <text x="200" y="77" class="activity-text" fill="white" font-weight="bold">Start</text>
+                    
+                    <!-- Navigate to Schedule -->
+                    <rect x="120" y="120" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="145" class="activity-text">Navigate to</text>
+                    <text x="200" y="165" class="activity-text">Schedule Page</text>
+                    
+                    <line x1="200" y1="95" x2="200" y2="120" class="flow-line"/>
+                    
+                    <!-- Click Create New Session -->
+                    <line x1="200" y1="180" x2="200" y2="210" class="flow-line"/>
+                    <rect x="120" y="210" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="235" class="activity-text">Click "Create New</text>
+                    <text x="200" y="255" class="activity-text">Session"</text>
+                    
+                    <!-- Flow to System -->
+                    <line x1="200" y1="270" x2="200" y2="310" class="flow-line"/>
+                    <line x1="200" y1="310" x2="650" y2="310" class="flow-line"/>
+                    <line x1="650" y1="310" x2="650" y2="340" class="flow-line"/>
+                    
+                    <!-- Display Form -->
+                    <rect x="570" y="340" width="160" height="60" rx="10" class="activity"/>
+                    <text x="650" y="365" class="activity-text">Display Session</text>
+                    <text x="650" y="385" class="activity-text">Creation Form</text>
+                    
+                    <!-- Back to Teacher -->
+                    <line x1="650" y1="400" x2="650" y2="440" class="flow-line"/>
+                    <line x1="650" y1="440" x2="200" y2="440" class="flow-line"/>
+                    <line x1="200" y1="440" x2="200" y2="470" class="flow-line"/>
+                    
+                    <!-- Fill Form -->
+                    <rect x="120" y="470" width="160" height="60" rx="10" class="activity"/>
+                    <text x="200" y="490" class="activity-text">Enter Session</text>
+                    <text x="200" y="505" class="activity-text">Details & Submit</text>
+                    <text x="200" y="520" class="activity-text" font-size="11">(Date, Time, Location)</text>
+                    
+                    <!-- Flow to validation -->
+                    <line x1="200" y1="530" x2="200" y2="570" class="flow-line"/>
+                    <line x1="200" y1="570" x2="650" y2="570" class="flow-line"/>
+                    <line x1="650" y1="570" x2="650" y2="600" class="flow-line"/>
+                    
+                    <!-- Validate Teacher Assignment -->
+                    <rect x="570" y="600" width="160" height="60" rx="10" class="activity"/>
+                    <text x="650" y="625" class="activity-text">Validate Teacher</text>
+                    <text x="650" y="645" class="activity-text">Authorization</text>
+                    
+                    <!-- Decision: Authorized? -->
+                    <line x1="650" y1="660" x2="650" y2="690" class="flow-line"/>
+                    <polygon points="650,690 700,740 650,790 600,740" class="decision"/>
+                    <text x="650" y="735" class="decision-text">Teacher</text>
+                    <text x="650" y="750" class="decision-text">Authorized?</text>
+                    
+                    <!-- No - Unauthorized -->
+                    <line x1="600" y1="740" x2="450" y2="740" class="no-flow"/>
+                    <line x1="450" y1="740" x2="450" y2="1020" class="no-flow"/>
+                    <text x="520" y="730" class="flow-label" fill="#f44336">No</text>
+                    
+                    <rect x="370" y="1020" width="160" height="60" rx="10" class="activity"/>
+                    <text x="450" y="1040" class="activity-text" fill="#d32f2f">Display Error:</text>
+                    <text x="450" y="1055" class="activity-text" fill="#d32f2f">"Unauthorized"</text>
+                    
+                    <line x1="450" y1="1080" x2="450" y2="1100" class="flow-line"/>
+                    <line x1="450" y1="1100" x2="200" y2="1100" class="flow-line"/>
+                    
+                    <!-- Yes - Check Conflicts -->
+                    <line x1="650" y1="790" x2="650" y2="820" class="yes-flow"/>
+                    <text x="660" y="810" class="flow-label" fill="#4caf50">Yes</text>
+                    
+                    <rect x="570" y="820" width="160" height="60" rx="10" class="activity"/>
+                    <text x="650" y="845" class="activity-text">Check Schedule</text>
+                    <text x="650" y="865" class="activity-text">Conflicts</text>
+                    
+                    <!-- Decision: Conflicts? -->
+                    <line x1="650" y1="880" x2="650" y2="910" class="flow-line"/>
+                    <polygon points="650,910 700,960 650,1010 600,960
