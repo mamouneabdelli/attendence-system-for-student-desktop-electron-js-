@@ -135,13 +135,6 @@ Contributions are welcome!
 3. Commit your changes
 4. Submit a Pull Request
 
----
-
-## 📄 License
-
-Specify your license here (MIT, GPL, etc.)
-
----
 
 ## 👨‍💻 Author
 
