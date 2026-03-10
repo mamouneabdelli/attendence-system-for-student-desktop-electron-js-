@@ -139,6 +139,7 @@ Contributions are welcome!
 ## 👨‍💻 Author
 
 Developed as a desktop academic management solution using modern web technologies.
+![Screenshot]()
 
 ---
 
