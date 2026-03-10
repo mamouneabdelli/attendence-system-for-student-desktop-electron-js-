@@ -136,7 +136,7 @@ Contributions are welcome!
 4. Submit a Pull Request
 
 
-## 👨‍💻 Author
+
 
 Developed as a desktop academic management solution using modern web technologies.
 ![Screenshot](https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-/blob/821f330fff9d9bd8d215afc9b9b86f8955f099a9/Capture%20d%E2%80%99%C3%A9cran%20(105).png)
