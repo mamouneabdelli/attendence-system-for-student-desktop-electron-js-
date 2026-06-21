@@ -1,150 +1,138 @@
+<div align="center">
 
+<h1>🎓 Attendance System</h1>
+<p><strong>A cross-platform desktop application for academic attendance management — powered by QR codes and built with Electron.js</strong></p>
 
-# 🎓 Attendance System for Students
+<p>
+  <img src="https://img.shields.io/badge/Electron.js-Desktop-47848F?style=flat-square&logo=electron&logoColor=white" />
+  <img src="https://img.shields.io/badge/Stack-HTML%20%2F%20CSS%20%2F%20JS-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/Design-Figma-F24E1E?style=flat-square&logo=figma&logoColor=white" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" />
+</p>
 
-### Desktop Application built with Electron.js
-
-An advanced **desktop-based attendance management system** built using **Electron.js**, designed to simplify academic attendance tracking through QR code technology.
-
-This project provides separate dashboards for **administrators** and **teachers**, allowing efficient management of users, courses, sessions, and student attendance.
-
----
-
-## 🚀 Project Overview
-
-The **Attendance System** is a desktop application that digitalizes attendance management in educational institutions.
-
-It includes:
-
-* 🛠️ **Admin Dashboard**
-* 👨‍🏫 **Teacher Dashboard**
-* 📱 QR Code-based attendance system
-* 🎨 UI/UX designed in Figma
-* 💻 Built with Electron.js
+</div>
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## Overview
 
-* 🖥️ **Framework:** Electron
-* 🎨 **UI/UX Design:** Figma
-* 🧠 **Frontend:** HTML, CSS, JavaScript
-* 💾 Desktop-based local system
+The **Attendance System** is a desktop application that replaces paper-based roll calls with a fast, QR-code-driven workflow. Teachers generate a unique QR code per session; students scan it from their phones; attendance is recorded instantly — no manual entry, no errors, no proxies.
 
-Electron.js allows the application to run as a cross-platform desktop app using web technologies.
+It ships with two role-specific dashboards:
 
----
-
-## 👨‍💼 Admin Dashboard Features
-
-The Admin has full control over the system:
-
-* 👩‍🏫 Manage teachers (Create, Update, Delete)
-* 📚 Create and manage courses
-* 📘 Assign modules to teachers
-* 🔗 Associate teachers with courses
-* 👤 Create and manage user accounts
-* 🗂️ System configuration management
-
-The admin dashboard acts as the **central control panel** of the platform.
+| Role | Responsibility |
+|---|---|
+| **Admin** | Manage teachers, courses, modules, and user accounts |
+| **Teacher** | Run sessions, generate QR codes, validate attendance and justifications |
 
 ---
 
-## 👨‍🏫 Teacher Dashboard Features
+## Screenshots
 
-Teachers can:
+![Admin Dashboard](https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-/blob/821f330fff9d9bd8d215afc9b9b86f8955f099a9/Capture%20d%E2%80%99%C3%A9cran%20(105).png)
 
-* 📅 Create attendance sessions
-* 📱 Generate dynamic QR Codes for each session
-* ✅ Track student attendance in real time
-* 📝 Validate student justifications (absence excuses)
-* 📊 Manage course sessions
+![Teacher Dashboard](https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-/blob/821f330fff9d9bd8d215afc9b9b86f8955f099a9/Capture%20d%E2%80%99%C3%A9cran%20(107).png)
 
-This makes attendance tracking faster and more secure compared to manual methods.
+![QR Code Session](https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-/blob/821f330fff9d9bd8d215afc9b9b86f8955f099a9/Capture%20d%E2%80%99%C3%A9cran%20(108).png)
 
 ---
 
-## 📱 QR Code Attendance System
+## Tech Stack
 
-1. Teacher creates a session.
-2. The system generates a unique QR code.
-3. Students scan the QR code using the student application.
-4. Attendance is recorded automatically.
-5. Teacher reviews and validates attendance records.
-
-This reduces:
-
-* Manual errors
-* Fake attendance
-* Time spent on roll calls
+| Layer | Technology |
+|---|---|
+| Framework | [Electron.js](https://www.electronjs.org/) |
+| Frontend | HTML, CSS, JavaScript |
+| UI/UX Design | Figma |
+| Distribution | Cross-platform desktop (Windows, macOS, Linux) |
 
 ---
 
-## 🎨 UI/UX Design
+## Features
 
-The entire interface was designed using:
+### 🛠️ Admin Dashboard
+- Create, update, and delete teacher accounts
+- Define courses and assign modules
+- Link teachers to courses
+- Manage all user accounts and system settings
 
-👉 Figma
+### 👨‍🏫 Teacher Dashboard
+- Create and manage attendance sessions
+- Generate a unique, time-bound QR code per session
+- Monitor live attendance as students scan in
+- Review and approve or reject absence justifications
 
-The goal was to create:
+### 📱 QR Code Attendance Flow
 
-* Clean layout
-* Simple navigation
-* User-friendly dashboards
-* Professional academic design
+```
+Teacher opens session  →  Unique QR code is generated
+       ↓
+Students scan with their phones
+       ↓
+Attendance recorded automatically
+       ↓
+Teacher reviews, validates, and closes session
+```
+
+This eliminates manual roll calls, proxy attendance, and transcription errors.
 
 ---
 
-## 📦 Installation
+## Getting Started
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) v16 or later
+- npm
+
+### Installation
 
 ```bash
-git clone https://github.com/your-username/attendence-system-for-student-desktop-electron-js.git
-cd attendence-system-for-student-desktop-electron-js
+# Clone the repository
+git clone https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-.git
+
+# Navigate into the project
+cd attendence-system-for-student-desktop-electron-js-
+
+# Install dependencies
 npm install
+
+# Launch the application
 npm start
 ```
 
 ---
 
-## 🔮 Future Improvements
+## Roadmap
 
-* Cloud synchronization
-* Role-based authentication system
-* Data analytics dashboard
-* Multi-university support
-* Export attendance reports (PDF/Excel)
-* Mobile app integration
-
----
-
-## 🎯 Project Goals
-
-* Digitize academic attendance systems
-* Reduce administrative workload
-* Improve attendance accuracy
-* Provide modern classroom tools
+- [ ] Role-based authentication with JWT
+- [ ] Cloud sync and remote database support
+- [ ] Attendance analytics dashboard
+- [ ] Export reports to PDF and Excel
+- [ ] Mobile companion app for students
+- [ ] Multi-institution support
 
 ---
 
-## 🤝 Contribution
+## Contributing
 
-Contributions are welcome!
+Contributions are welcome. To get started:
 
-1. Fork the project
-2. Create a feature branch
-3. Commit your changes
-4. Submit a Pull Request
+1. Fork the repository
+2. Create a feature branch — `git checkout -b feature/your-feature`
+3. Commit your changes — `git commit -m "Add your feature"`
+4. Push to your branch — `git push origin feature/your-feature`
+5. Open a Pull Request
 
-
-
-
-Developed as a desktop academic management solution using modern web technologies.
-![Screenshot](https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-/blob/821f330fff9d9bd8d215afc9b9b86f8955f099a9/Capture%20d%E2%80%99%C3%A9cran%20(105).png)
-
-![Screenshot](https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-/blob/821f330fff9d9bd8d215afc9b9b86f8955f099a9/Capture%20d%E2%80%99%C3%A9cran%20(107).png)
-![Screenshot](https://github.com/mamouneabdelli/attendence-system-for-student-desktop-electron-js-/blob/821f330fff9d9bd8d215afc9b9b86f8955f099a9/Capture%20d%E2%80%99%C3%A9cran%20(108).png)
+Please keep commits focused and PRs scoped to a single feature or fix.
 
 ---
 
+## License
 
+This project is open source. Add your preferred license here.
 
+---
+
+<div align="center">
+  <sub>Built with Electron.js · Designed in Figma · Developed by <a href="https://github.com/mamouneabdelli">Abdelli Abdelmoumen</a></sub>
+</div>
