@@ -126,6 +126,8 @@ Contributions are welcome. To get started:
 Please keep commits focused and PRs scoped to a single feature or fix.
 
 ---
+#future ideas 
+adding chatbot to help teacher and student and make user experience more better 
 
 ## License
 
